@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meee's Travel Diaries & WanderList ✈️</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #08121e;
+      color: #e0f2fe;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-serif-title {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Light Blue Frosted Glassmorphism Card */
+    .glass-panel {
+      background: rgba(14, 28, 48, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(186, 230, 253, 0.12);
+    }
+
+    .glass-panel-hover {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-panel-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(125, 211, 252, 0.35);
+      box-shadow: 0 20px 40px -15px rgba(2, 132, 199, 0.25), 0 0 25px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Star Rating CSS */
+    .star-btn {
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+    .star-btn:hover {
+      transform: scale(1.2);
+    }
+
+    /* Custom Light Blue Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #08121e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0284c7;
+    }
+
+    /* Soft Powder & Sky Blue Ambient Glow Blobs */
+    .bg-blob-1 {
+      position: fixed;
+      top: -10%;
+      left: 10%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-blob-2 {
+      position: fixed;
+      bottom: -10%;
+      right: 10%;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-blob-3 {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(125, 211, 252, 0.08) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spinSlow 20s linear infinite;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col min-h-screen">
+
+  <!-- Background Decorative Ambient Glows -->
+  <div class="bg-blob-1"></div>
+  <div class="bg-blob-2"></div>
+  <div class="bg-blob-3"></div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- MAIN HEADER & NAV -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-sky-400/20 bg-slate-950/80 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-400 via-cyan-400 to-blue-500 flex items-center justify-center text-slate-950 text-xl shadow-lg shadow-sky-400/30">
+          <i class="fa-solid fa-compass animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="font-serif-title text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-100 via-sky-200 to-cyan-300">
+            Meee's Travel Diaries
+          </h1>
+          <p class="text-xs font-semibold text-sky-200/70 tracking-wide uppercase flex items-center gap-2">
+            <span>WanderList & Passport Logs</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400"></span>
+            <span class="text-sky-300">Light Blue Edition</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Search & Action Controls -->
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <!-- Search Input -->
+        <div class="relative flex-1 md:w-72">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-400/70 text-sm"></i>
+          <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Search places, cities, tags..." class="w-full bg-slate-900/90 border border-sky-500/25 rounded-xl pl-9 pr-4 py-2 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition">
+        </div>
+
+        <!-- Suggest Place Button -->
+        <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 hover:from-sky-300 hover:to-cyan-300 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-sky-400/25 transition active:scale-95 whitespace-nowrap">
+          <i class="fa-solid fa-plus"></i>
+          <span>Suggest Spot</span>
+        </button>
+
+        <!-- Quiz Trigger Button -->
+        <button onclick="openQuizModal()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-sky-500/30 text-sky-200 text-xs font-semibold flex items-center gap-2 transition active:scale-95" title="Travel Vibe Quiz">
+          <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i>
+          <span class="hidden sm:inline">Vibe Match</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTENT WRAPPER -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 space-y-8">
+
+    <!-- QUICK STATS DASHBOARD BANNER -->
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      
+      <div class="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-sky-400/20">
+        <div class="w-10 h-10 rounded-xl bg-sky-400/10 border border-sky-400/30 flex items-center justify-center text-sky-300 text-lg">
+          <i class="fa-solid fa-earth-americas"></i>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold text-sky-100" id="stat-visited-count">0</div>
+          <div class="text-[11px] font-medium text-sky-300/70">Places Logged</div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-sky-400/20">
+        <div class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-300 text-lg">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold text-sky-100" id="stat-avg-rating">4.8</div>
+          <div class="text-[11px] font-medium text-sky-300/70">Meee's Avg Rating</div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-sky-400/20">
+        <div class="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300 text-lg">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold text-sky-100 truncate max-w-[110px]" id="stat-top-spot">Kyoto</div>
+          <div class="text-[11px] font-medium text-sky-300/70">Favorite Pick</div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-sky-400/20">
+        <div class="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/30 flex items-center justify-center text-blue-300 text-lg">
+          <i class="fa-solid fa-comments"></i>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold text-sky-100" id="stat-total-reviews">0</div>
+          <div class="text-[11px] font-medium text-sky-300/70">Classmate Reviews</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CATEGORY FILTER TAGS BAR -->
+    <section class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="filter-bar">
+      <!-- Generated dynamically by JS -->
+    </section>
+
+    <!-- SECTION TITLE & TAB TOGGLE -->
+    <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-500/20 pb-4">
+      <div>
+        <h2 class="font-serif-title text-2xl font-bold text-sky-100 flex items-center gap-2">
+          <span id="feed-title-text">Meee's Travel Collection</span>
+          <span class="text-xs font-sans font-semibold px-2.5 py-0.5 rounded-full bg-slate-900 border border-sky-500/30 text-sky-300" id="feed-count-badge">0 spots</span>
+        </h2>
+        <p class="text-xs text-sky-300/70 mt-1">Explore reviews, ratings, and classmate recommendations in powder blue clarity.</p>
+      </div>
+
+      <div class="flex items-center gap-2 bg-slate-900/90 p-1 rounded-xl border border-sky-500/25">
+        <button onclick="switchViewMode('my-logs')" id="tab-my-logs" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-sky-950 bg-sky-300 shadow">
+          Meee's Log
+        </button>
+        <button onclick="switchViewMode('bucket-list')" id="tab-bucket-list" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-sky-300/70 hover:text-sky-100">
+          Classmate Bucket List
+        </button>
+      </div>
+    </section>
+
+    <!-- MAIN PLACES GRID FEED -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="places-grid">
+      <!-- Dynamically Rendered Place Cards -->
+    </section>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="hidden text-center py-16 space-y-3 glass-panel rounded-3xl border border-sky-400/20">
+      <div class="text-4xl text-sky-400/50"><i class="fa-solid fa-map-location-dot"></i></div>
+      <h3 class="text-lg font-bold text-sky-200">No destinations found</h3>
+      <p class="text-xs text-sky-300/60 max-w-sm mx-auto">Try clearing your search or picking a different filter tag above!</p>
+      <button onclick="resetFilters()" class="px-4 py-2 rounded-xl bg-slate-900 border border-sky-400/40 text-sky-300 text-xs font-bold hover:bg-sky-400 hover:text-slate-950 transition">Reset All Filters</button>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="glass-panel border-t border-sky-500/20 mt-12 py-6 text-center text-xs text-sky-300/60">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <span>&copy; Meee's Travel Diaries & WanderList &bull; Powder Blue Aesthetic</span>
+      <div class="flex gap-4">
+        <button onclick="openAddModal()" class="hover:text-sky-300 transition">Suggest Place</button>
+        <button onclick="openQuizModal()" class="hover:text-sky-300 transition">Vibe Matcher</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. DETAILED PLACE & REVIEWS MODAL -->
+  <div id="modal-details" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="glass-panel border border-sky-400/30 rounded-3xl max-w-3xl w-full my-auto overflow-hidden shadow-2xl relative animate-fade-in">
+      
+      <!-- Close Button -->
+      <button onclick="closeDetailsModal()" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-slate-950/80 border border-sky-400/40 text-sky-200 hover:text-white flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Banner Header Photo -->
+      <div class="relative h-64 sm:h-80 w-full overflow-hidden">
+        <img id="detail-img" src="" alt="Place photo" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+        
+        <div class="absolute bottom-4 left-6 right-6 space-y-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="detail-category" class="px-2.5 py-1 rounded-full bg-sky-400/20 border border-sky-300/40 text-sky-200 text-[11px] font-bold uppercase tracking-wider">Category</span>
+            <span id="detail-visited-date" class="px-2.5 py-1 rounded-full bg-slate-900/80 border border-sky-500/20 text-sky-200 text-[11px] font-medium">Logged 2026</span>
+          </div>
+          <h2 id="detail-title" class="font-serif-title text-3xl sm:text-4xl font-extrabold text-sky-100">Destination Name</h2>
+          <p id="detail-location" class="text-xs font-semibold text-sky-300/80"><i class="fa-solid fa-location-dot text-sky-400"></i> City, Country</p>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+        
+        <!-- Ratings & Highlights Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- Meee's Rating & Review -->
+          <div class="bg-slate-900/90 border border-sky-500/20 rounded-2xl p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-sky-300/70 uppercase tracking-wider">Meee's Log Review</span>
+              <div class="flex items-center text-amber-300 text-sm gap-1" id="detail-meee-stars"></div>
+            </div>
+            <p id="detail-review-text" class="text-xs sm:text-sm text-sky-100 font-medium leading-relaxed">
+              Detailed takeaway review text...
+            </p>
+            <div class="text-[11px] font-semibold text-sky-300 pt-1" id="detail-best-highlight">
+              💡 Must Do: Try the matcha shaved ice
+            </div>
+          </div>
+
+          <!-- Community Stats -->
+          <div class="bg-slate-900/90 border border-sky-500/20 rounded-2xl p-4 space-y-3 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-sky-300/70 uppercase tracking-wider block mb-1">Classmate Rating</span>
+              <div class="flex items-baseline gap-2">
+                <span id="detail-avg-score" class="text-3xl font-extrabold text-sky-100">4.9</span>
+                <span class="text-xs text-sky-300/60">/ 5.0</span>
+                <span id="detail-review-count-badge" class="text-xs text-sky-400/80 font-semibold">(0 reviews)</span>
+              </div>
+            </div>
+
+            <button id="detail-bookmark-btn" onclick="toggleBookmarkFromModal()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-sky-400/30 text-xs font-bold text-sky-200 flex items-center justify-center gap-2 transition">
+              <i class="fa-regular fa-bookmark"></i>
+              <span>Add to My Want-To-Go List</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- COMMUNITY REVIEWS & COMMENT SECTION -->
+        <div class="space-y-4 pt-2 border-t border-sky-500/20">
+          <h3 class="font-serif-title text-xl font-bold text-sky-100 flex items-center justify-between">
+            <span>Classmate Reviews & Ratings</span>
+            <span class="text-xs font-sans text-sky-300 font-semibold" id="comment-list-count">0 Thoughts</span>
+          </h3>
+
+          <!-- Add Review Form -->
+          <form id="review-form" onsubmit="submitClassmateReview(event)" class="bg-slate-900/90 border border-sky-500/20 rounded-2xl p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="text-xs font-bold text-sky-200">Leave your rating & thought:</span>
+              
+              <!-- Interactive Star Picker -->
+              <div class="flex items-center gap-1 text-slate-700 text-lg" id="star-picker">
+                <button type="button" onclick="setPickRating(1)" class="star-btn"><i class="fa-solid fa-star"></i></button>
+                <button type="button" onclick="setPickRating(2)" class="star-btn"><i class="fa-solid fa-star"></i></button>
+                <button type="button" onclick="setPickRating(3)" class="star-btn"><i class="fa-solid fa-star"></i></button>
+                <button type="button" onclick="setPickRating(4)" class="star-btn"><i class="fa-solid fa-star"></i></button>
+                <button type="button" onclick="setPickRating(5)" class="star-btn"><i class="fa-solid fa-star"></i></button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input type="text" id="reviewer-name" required placeholder="Your Name / Classmate Tag" class="sm:col-span-1 bg-slate-950 border border-sky-500/25 rounded-xl px-3 py-2 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400">
+              <input type="text" id="reviewer-msg" required placeholder="What do you think of this place? Any tips?" class="sm:col-span-2 bg-slate-950 border border-sky-500/25 rounded-xl px-3 py-2 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400">
+            </div>
+
+            <div class="flex justify-end">
+              <button type="submit" class="px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-paper-plane"></i> Post Review
+              </button>
+            </div>
+          </form>
+
+          <!-- List of Classmate Reviews -->
+          <div id="modal-reviews-list" class="space-y-3 pt-2">
+            <!-- Dynamically Rendered -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. ADD / SUGGEST A PLACE MODAL -->
+  <div id="modal-add" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel border border-sky-400/30 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative my-auto">
+      
+      <div class="flex justify-between items-center border-b border-sky-500/20 pb-3">
+        <div>
+          <h3 class="font-serif-title text-2xl font-bold text-sky-100">Suggest a Destination</h3>
+          <p class="text-xs text-sky-300/70">Add a spot Meee should visit & review next!</p>
+        </div>
+        <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-900 border border-sky-400/30 text-sky-300 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAddPlaceSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-1">Destination Name *</label>
+          <input type="text" id="add-name" required placeholder="e.g. Santorini, Banff Lake, Shinjuku" class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-sky-200 mb-1">City / Country *</label>
+            <input type="text" id="add-location" required placeholder="e.g. Greece" class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-sky-200 mb-1">Category / Vibe</label>
+            <select id="add-category" class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 focus:outline-none focus:border-sky-400">
+              <option value="Asia">Asia</option>
+              <option value="Europe">Europe</option>
+              <option value="Americas">Americas</option>
+              <option value="Hidden Gems">Hidden Gems</option>
+              <option value="Foodie Spots">Foodie Spots</option>
+              <option value="Chill Vibes">Chill Vibes</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-1">Your Rating / Recommendation Score</label>
+          <select id="add-rating" class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 focus:outline-none focus:border-sky-400">
+            <option value="5.0">⭐⭐⭐⭐⭐ (5.0 - Absolute Must Visit!)</option>
+            <option value="4.5">⭐⭐⭐⭐½ (4.5 - Amazing Vibe)</option>
+            <option value="4.0">⭐⭐⭐⭐ (4.0 - Really Good)</option>
+            <option value="3.5">⭐⭐⭐½ (3.5 - Pretty Cool)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-1">Why should Meee visit this spot? *</label>
+          <textarea id="add-review" required rows="3" placeholder="Tell us what makes this place special, best food, or photo spots..." class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-1">Suggested By (Your Name) *</label>
+          <input type="text" id="add-author" required placeholder="e.g. Alex (Classmate)" class="w-full bg-slate-900 border border-sky-500/25 rounded-xl px-3.5 py-2.5 text-xs text-sky-100 placeholder-sky-300/40 focus:outline-none focus:border-sky-400">
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-sky-200 text-xs font-bold hover:bg-slate-700">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 text-slate-950 text-xs font-bold hover:brightness-110 shadow-lg shadow-sky-400/25">Add to Bucket List</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- 3. TRAVEL VIBE MATCHER / WANDER-QUIZ MODAL -->
+  <div id="modal-quiz" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel border border-sky-400/30 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative my-auto">
+      
+      <div class="flex justify-between items-center border-b border-sky-500/20 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-sky-400/20 text-sky-300 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="font-serif-title text-xl font-bold text-sky-100">Travel Vibe Matcher</h3>
+            <p class="text-[11px] text-sky-300/70">Find your ideal destination in 3 quick taps!</p>
+          </div>
+        </div>
+        <button onclick="closeQuizModal()" class="w-8 h-8 rounded-full bg-slate-900 border border-sky-400/30 text-sky-300 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quiz Form Container -->
+      <div id="quiz-step-box" class="space-y-4">
+        
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-2">1. What kind of atmosphere are you in the mood for?</label>
+          <div class="grid grid-cols-2 gap-2" id="quiz-q1">
+            <button onclick="selectQuizOpt(1, 'Chill Vibes', this)" class="q1-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">☕ Peaceful & Cozy</button>
+            <button onclick="selectQuizOpt(1, 'Foodie Spots', this)" class="q1-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">🍜 Delicious Eats</button>
+            <button onclick="selectQuizOpt(1, 'Hidden Gems', this)" class="q1-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">🌿 Off the beaten path</button>
+            <button onclick="selectQuizOpt(1, 'Asia', this)" class="q1-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">🏯 Culture & Heritage</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-sky-200 mb-2">2. Who are you traveling with?</label>
+          <div class="grid grid-cols-2 gap-2" id="quiz-q2">
+            <button onclick="selectQuizOpt(2, 'solo', this)" class="q2-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">🎧 Solo Trip</button>
+            <button onclick="selectQuizOpt(2, 'friends', this)" class="q2-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 hover:border-sky-400/50 text-xs font-semibold text-left text-sky-200">👯 Classmates & Crew</button>
+          </div>
+        </div>
+
+        <button onclick="calculateQuizResult()" class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-sky-400/25 hover:brightness-110 transition">
+          ✨ Reveal My Match!
+        </button>
+
+      </div>
+
+      <!-- Quiz Result Box -->
+      <div id="quiz-result-box" class="hidden text-center space-y-4 py-2">
+        <div class="text-xs font-bold text-sky-400 uppercase tracking-widest">Your Perfect Match</div>
+        <div id="quiz-recommended-card" class="bg-slate-900 border border-sky-500/20 rounded-2xl p-4 text-left space-y-2">
+          <!-- Recommended Card injected here -->
+        </div>
+        <button onclick="resetQuiz()" class="text-xs font-bold text-sky-300 hover:text-sky-200 transition">Try Again 🔄</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP ENGINE -->
+  <script>
+    let placesData = [];
+    let bookmarks = [];
+    let activeFilter = 'All';
+    let searchQuery = '';
+    let activeViewMode = 'my-logs'; // 'my-logs' or 'bucket-list'
+    let currentSelectedPlaceId = null;
+    let currentSelectedRating = 5;
+    let quizAnswers = { q1: 'Chill Vibes', q2: 'friends' };
+
+    // Initial default dataset to fix reference error
+    const INITIAL_PLACES = [
+      {
+        id: 'place-1',
+        title: 'Arashiyama Bamboo Grove & Kyoto Alleyways',
+        location: 'Kyoto, Japan',
+        category: 'Asia',
+        tags: ['Asia', 'Chill Vibes', 'Foodie Spots'],
+        meeeRating: 5.0,
+        meeeReview: 'Walking through the towering bamboo at 7 AM was pure magic before the crowds arrived. Make sure to try the matcha shaved ice right by the river!',
+        bestThing: 'Early morning stroll & Percent Arabica coffee near Togetsukyo Bridge',
+        dateVisited: 'Spring 2026',
+        image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+        isMeeeLog: true,
+        author: 'Meee',
+        communityReviews: [
+          { name: 'Sarah M.', rating: 5, msg: 'Kyoto is literally elite! Did you check out Fushimi Inari at sunset?', likes: 4, timeAgo: '2d ago' },
+          { name: 'Kenji', rating: 5, msg: 'The matcha spot is a 10/10 recommendation!', likes: 2, timeAgo: '1d ago' }
+        ]
+      },
+      {
+        id: 'place-2',
+        title: 'Oia Sunset & Cliffside Cafes',
+        location: 'Santorini, Greece',
+        category: 'Europe',
+        tags: ['Europe', 'Chill Vibes'],
+        meeeRating: 4.8,
+        meeeReview: 'The blue domes and white-washed houses look like a literal postcard. Grab a gelato and secure a spot on the castle steps early for sunset.',
+        bestThing: 'Sunset views from Oia Castle ruins and fresh seafood in Ammoudi Bay',
+        dateVisited: 'Summer 2025',
+        image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+        isMeeeLog: true,
+        author: 'Meee',
+        communityReviews: [
+          { name: 'Liam T.', rating: 4.5, msg: 'Super crowded in July but worth every second for the views!', likes: 3, timeAgo: '3d ago' }
+        ]
+      },
+      {
+        id: 'place-3',
+        title: 'Moraine Lake & Valley of the Ten Peaks',
+        location: 'Banff National Park, Canada',
+        category: 'Americas',
+        tags: ['Americas', 'Hidden Gems', 'Chill Vibes'],
+        meeeRating: 4.9,
+        meeeReview: 'The turquoise color of the water does not look real until you stand right in front of it! Rented a canoe and it felt like floating on liquid paint.',
+        bestThing: 'Canoeing across the glacial lake at sunrise',
+        dateVisited: 'Autumn 2025',
+        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+        isMeeeLog: true,
+        author: 'Meee',
+        communityReviews: [
+          { name: 'Chloe B.', rating: 5, msg: 'Banff is on top of my bucket list! Did you see any wildlife?', likes: 1, timeAgo: '5d ago' }
+        ]
+      },
+      {
+        id: 'place-4',
+        title: 'Hongdae Street Food & Cafe Culture',
+        location: 'Seoul, South Korea',
+        category: 'Asia',
+        tags: ['Asia', 'Foodie Spots'],
+        meeeRating: 4.7,
+        meeeReview: 'Endless street performances, vintage thrift shops, and aesthetic cafes on every single corner. Tteokbokki at 2 AM was top tier.',
+        bestThing: 'Self-photo booths, churro cafes, and live busking',
+        dateVisited: 'Winter 2025',
+        image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80',
+        isMeeeLog: true,
+        author: 'Meee',
+        communityReviews: [
+          { name: 'Minh', rating: 5, msg: 'The cafe scene in Yeonnam-dong near Hongdae is unmatched!', likes: 6, timeAgo: '1w ago' }
+        ]
+      },
+      {
+        id: 'place-5',
+        title: 'Lauterbrunnen Valley & Waterfall Village',
+        location: 'Swiss Alps, Switzerland',
+        category: 'Europe',
+        tags: ['Europe', 'Hidden Gems'],
+        meeeRating: 5.0,
+        meeeReview: 'Felt like stepping directly into Rivendell! 72 gushing waterfalls right in a single lush green valley surrounded by massive alpine cliffs.',
+        bestThing: 'Taking the cable car up to Mürren for peak views',
+        dateVisited: 'Summer 2025',
+        image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80',
+        isMeeeLog: true,
+        author: 'Meee',
+        communityReviews: []
+      }
+    ];
+
+    // Web Audio API Synthesizer for sound effects
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      playPop() {
+        try {
+          this.init();
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch (e) {}
+      }
+      playSparkle() {
+        try {
+          this.init();
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const freqs = [523.25, 659.25, 783.99, 1046.50];
+          freqs.forEach((f, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.05);
+            gain.gain.setValueAtTime(0.08, this.ctx.currentTime + i * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.05 + 0.15);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime + i * 0.05);
+            osc.stop(this.ctx.currentTime + i * 0.05 + 0.15);
+          });
+        } catch (e) {}
+      }
+    }
+    const sound = new SoundEngine();
+
+    function showToast(message, icon = 'fa-circle-check') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'glass-panel px-4 py-3 rounded-2xl border border-sky-400/40 text-sky-100 text-xs font-bold flex items-center gap-2 shadow-xl animate-fade-in pointer-events-auto';
+      toast.innerHTML = `<i class="fa-solid ${icon} text-sky-400"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'transition', 'duration-300');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    function loadAppData() {
+      const storedPlaces = localStorage.getItem('meee_travel_places');
+      placesData = storedPlaces ? JSON.parse(storedPlaces) : INITIAL_PLACES;
+
+      const storedBookmarks = localStorage.getItem('meee_travel_bookmarks');
+      bookmarks = storedBookmarks ? JSON.parse(storedBookmarks) : [];
+
+      updateStatsDashboard();
+      renderCategoryFilters();
+      renderPlacesGrid();
+    }
+
+    function saveAppData() {
+      localStorage.setItem('meee_travel_places', JSON.stringify(placesData));
+      localStorage.setItem('meee_travel_bookmarks', JSON.stringify(bookmarks));
+      updateStatsDashboard();
+    }
+
+    function updateStatsDashboard() {
+      const meeeLogs = placesData.filter(p => p.isMeeeLog);
+      document.getElementById('stat-visited-count').innerText = meeeLogs.length;
+
+      const totalMeeeRating = meeeLogs.reduce((acc, p) => acc + p.meeeRating, 0);
+      const avgRating = meeeLogs.length > 0 ? (totalMeeeRating / meeeLogs.length).toFixed(1) : '5.0';
+      document.getElementById('stat-avg-rating').innerText = avgRating;
+
+      let totalReviewsCount = 0;
+      placesData.forEach(p => { totalReviewsCount += (p.communityReviews ? p.communityReviews.length : 0); });
+      document.getElementById('stat-total-reviews').innerText = totalReviewsCount;
+    }
+
+    const CATEGORIES = ['All', 'Asia', 'Europe', 'Americas', 'Hidden Gems', 'Foodie Spots', 'Chill Vibes'];
+
+    function renderCategoryFilters() {
+      const container = document.getElementById('filter-bar');
+      container.innerHTML = '';
+
+      CATEGORIES.forEach(cat => {
+        const btn = document.createElement('button');
+        const isActive = activeFilter === cat;
+        btn.className = `px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition border ${
+          isActive 
+            ? 'bg-sky-400 text-slate-950 border-sky-300 shadow-md shadow-sky-400/20' 
+            : 'bg-slate-900/90 text-sky-200/70 border-sky-500/20 hover:text-sky-100 hover:border-sky-400/40'
+        }`;
+        btn.innerText = cat;
+        btn.onclick = () => {
+          sound.playPop();
+          activeFilter = cat;
+          renderCategoryFilters();
+          renderPlacesGrid();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.toLowerCase().trim();
+      renderPlacesGrid();
+    }
+
+    function resetFilters() {
+      sound.playPop();
+      activeFilter = 'All';
+      searchQuery = '';
+      document.getElementById('search-input').value = '';
+      renderCategoryFilters();
+      renderPlacesGrid();
+    }
+
+    function switchViewMode(mode) {
+      sound.playPop();
+      activeViewMode = mode;
+      
+      const tabLogs = document.getElementById('tab-my-logs');
+      const tabBucket = document.getElementById('tab-bucket-list');
+      const feedTitle = document.getElementById('feed-title-text');
+
+      if (mode === 'my-logs') {
+        tabLogs.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-950 bg-sky-300 shadow';
+        tabBucket.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-sky-300/70 hover:text-sky-100';
+        feedTitle.innerText = "Meee's Travel Collection";
+      } else {
+        tabBucket.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-950 bg-sky-300 shadow';
+        tabLogs.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition text-sky-300/70 hover:text-sky-100';
+        feedTitle.innerText = "Classmate Bucket List";
+      }
+
+      renderPlacesGrid();
+    }
+
+    function renderPlacesGrid() {
+      const grid = document.getElementById('places-grid');
+      const emptyState = document.getElementById('empty-state');
+      grid.innerHTML = '';
+
+      let filtered = placesData.filter(item => {
+        if (activeViewMode === 'my-logs' && !item.isMeeeLog) return false;
+        if (activeViewMode === 'bucket-list' && item.isMeeeLog) return false;
+
+        if (activeFilter !== 'All' && !item.tags.includes(activeFilter) && item.category !== activeFilter) {
+          return false;
+        }
+
+        if (searchQuery) {
+          const matchTitle = item.title.toLowerCase().includes(searchQuery);
+          const matchLoc = item.location.toLowerCase().includes(searchQuery);
+          const matchCategory = item.category.toLowerCase().includes(searchQuery);
+          if (!matchTitle && !matchLoc && !matchCategory) return false;
+        }
+
+        return true;
+      });
+
+      document.getElementById('feed-count-badge').innerText = `${filtered.length} spots`;
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach(place => {
+        const isBookmarked = bookmarks.includes(place.id);
+        const communityAvg = calculateCommunityAvg(place);
+        const reviewCount = place.communityReviews ? place.communityReviews.length : 0;
+
+        const card = document.createElement('div');
+        card.className = 'glass-panel glass-panel-hover rounded-3xl overflow-hidden flex flex-col justify-between border border-sky-400/20 group cursor-pointer';
+        card.onclick = (e) => {
+          if (e.target.closest('.action-btn')) return;
+          openDetailsModal(place.id);
+        };
+
+        card.innerHTML = `
+          <div>
+            <!-- Cover Photo Banner -->
+            <div class="relative h-48 w-full overflow-hidden bg-slate-900">
+              <img src="${place.image}" alt="${place.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+              
+              <!-- Badges Header -->
+              <div class="absolute top-3 left-3 right-3 flex justify-between items-center">
+                <span class="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-sky-400/30 text-[10px] font-extrabold text-sky-300 uppercase tracking-wider">
+                  ${place.category}
+                </span>
+                
+                <button onclick="toggleBookmark('${place.id}')" class="action-btn w-8 h-8 rounded-full bg-slate-950/80 backdrop-blur-md border border-sky-400/30 text-sky-200 hover:text-sky-400 flex items-center justify-center transition">
+                  <i class="${isBookmarked ? 'fa-solid text-sky-400' : 'fa-regular'} fa-bookmark"></i>
+                </button>
+              </div>
+
+              <!-- Location Tag -->
+              <div class="absolute bottom-3 left-3 text-xs font-semibold text-sky-100 flex items-center gap-1.5 drop-shadow">
+                <i class="fa-solid fa-location-dot text-sky-400"></i>
+                <span>${place.location}</span>
+              </div>
+            </div>
+
+            <!-- Card Content Body -->
+            <div class="p-5 space-y-3">
+              <h3 class="font-serif-title text-xl font-bold text-sky-100 group-hover:text-sky-300 transition line-clamp-1">
+                ${place.title}
+              </h3>
+
+              <!-- Rating Row -->
+              <div class="flex items-center justify-between text-xs border-b border-sky-500/15 pb-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-amber-300 text-sm"><i class="fa-solid fa-star"></i></span>
+                  <span class="font-extrabold text-sky-100">${place.meeeRating}</span>
+                  <span class="text-sky-300/60 text-[11px]">(Meee)</span>
+                </div>
+                
+                <div class="text-[11px] text-sky-200/80 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-users text-sky-400"></i>
+                  <span>${communityAvg} / 5 (${reviewCount})</span>
+                </div>
+              </div>
+
+              <!-- Takeaway Review Preview -->
+              <p class="text-xs text-sky-200/70 line-clamp-2 leading-relaxed">
+                "${place.meeeReview}"
+              </p>
+            </div>
+          </div>
+
+          <!-- Card Footer Action Row -->
+          <div class="px-5 pb-5 pt-2 flex items-center justify-between border-t border-sky-500/15 text-xs">
+            <span class="text-[11px] font-semibold text-sky-300/60">
+              <i class="fa-solid fa-clock-rotate-left mr-1"></i>${place.dateVisited}
+            </span>
+
+            <button onclick="openDetailsModal('${place.id}')" class="action-btn text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1 transition">
+              <span>Read & Rate</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function calculateCommunityAvg(place) {
+      if (!place.communityReviews || place.communityReviews.length === 0) return place.meeeRating.toFixed(1);
+      const sum = place.communityReviews.reduce((acc, r) => acc + Number(r.rating), 0);
+      return (sum / place.communityReviews.length).toFixed(1);
+    }
+
+    function toggleBookmark(placeId) {
+      sound.playPop();
+      if (bookmarks.includes(placeId)) {
+        bookmarks = bookmarks.filter(id => id !== placeId);
+        showToast('Removed from Want-To-Go List', 'fa-bookmark');
+      } else {
+        bookmarks.push(placeId);
+        showToast('Added to Want-To-Go List! 📌', 'fa-bookmark');
+      }
+      saveAppData();
+      renderPlacesGrid();
+    }
+
+    function toggleBookmarkFromModal() {
+      if (!currentSelectedPlaceId) return;
+      toggleBookmark(currentSelectedPlaceId);
+      updateModalBookmarkBtnState();
+    }
+
+    function updateModalBookmarkBtnState() {
+      const btn = document.getElementById('detail-bookmark-btn');
+      if (!btn || !currentSelectedPlaceId) return;
+      const isBookmarked = bookmarks.includes(currentSelectedPlaceId);
+      
+      if (isBookmarked) {
+        btn.className = 'w-full py-2.5 rounded-xl bg-sky-400/20 border border-sky-400/50 text-xs font-bold text-sky-200 flex items-center justify-center gap-2 transition';
+        btn.innerHTML = `<i class="fa-solid fa-bookmark text-sky-400"></i> <span>Saved in Want-To-Go List</span>`;
+      } else {
+        btn.className = 'w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-sky-400/30 text-xs font-bold text-sky-200 flex items-center justify-center gap-2 transition';
+        btn.innerHTML = `<i class="fa-regular fa-bookmark"></i> <span>Add to My Want-To-Go List</span>`;
+      }
+    }
+
+    function openDetailsModal(placeId) {
+      sound.playSparkle();
+      currentSelectedPlaceId = placeId;
+      const place = placesData.find(p => p.id === placeId);
+      if (!place) return;
+
+      document.getElementById('detail-img').src = place.image;
+      document.getElementById('detail-title').innerText = place.title;
+      document.getElementById('detail-location').innerHTML = `<i class="fa-solid fa-location-dot text-sky-400"></i> ${place.location}`;
+      document.getElementById('detail-category').innerText = place.category;
+      document.getElementById('detail-visited-date').innerText = `Logged: ${place.dateVisited}`;
+      document.getElementById('detail-review-text').innerText = `"${place.meeeReview}"`;
+      document.getElementById('detail-best-highlight').innerText = `💡 Best Highlight: ${place.bestThing || 'Exploring local spots!'}`;
+
+      const starsBox = document.getElementById('detail-meee-stars');
+      starsBox.innerHTML = renderStarsHTML(place.meeeRating);
+
+      const avg = calculateCommunityAvg(place);
+      const count = place.communityReviews ? place.communityReviews.length : 0;
+      document.getElementById('detail-avg-score').innerText = avg;
+      document.getElementById('detail-review-count-badge').innerText = `(${count} classmate reviews)`;
+
+      updateModalBookmarkBtnState();
+      renderCommunityReviewsList(place);
+      setPickRating(5);
+
+      document.getElementById('modal-details').classList.remove('hidden');
+    }
+
+    function closeDetailsModal() {
+      sound.playPop();
+      document.getElementById('modal-details').classList.add('hidden');
+      currentSelectedPlaceId = null;
+    }
+
+    function renderStarsHTML(score) {
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        if (score >= i) {
+          html += `<i class="fa-solid fa-star text-amber-300"></i>`;
+        } else if (score >= i - 0.5) {
+          html += `<i class="fa-solid fa-star-half-stroke text-amber-300"></i>`;
+        } else {
+          html += `<i class="fa-regular fa-star text-slate-700"></i>`;
+        }
+      }
+      return html;
+    }
+
+    function setPickRating(val) {
+      sound.playPop();
+      currentSelectedRating = val;
+      const buttons = document.querySelectorAll('#star-picker .star-btn');
+      buttons.forEach((btn, idx) => {
+        if (idx < val) {
+          btn.className = 'star-btn text-amber-300';
+        } else {
+          btn.className = 'star-btn text-slate-700';
+        }
+      });
+    }
+
+    function submitClassmateReview(e) {
+      e.preventDefault();
+      if (!currentSelectedPlaceId) return;
+
+      const name = document.getElementById('reviewer-name').value.trim();
+      const msg = document.getElementById('reviewer-msg').value.trim();
+
+      const place = placesData.find(p => p.id === currentSelectedPlaceId);
+      if (place) {
+        if (!place.communityReviews) place.communityReviews = [];
+        
+        place.communityReviews.unshift({
+          name: name,
+          rating: currentSelectedRating,
+          msg: msg,
+          likes: 0,
+          timeAgo: 'Just now'
+        });
+
+        saveAppData();
+        renderCommunityReviewsList(place);
+        
+        document.getElementById('detail-avg-score').innerText = calculateCommunityAvg(place);
+        document.getElementById('detail-review-count-badge').innerText = `(${place.communityReviews.length} classmate reviews)`;
+
+        document.getElementById('review-form').reset();
+        setPickRating(5);
+        showToast('Review posted successfully! 🌟');
+        renderPlacesGrid();
+      }
+    }
+
+    function renderCommunityReviewsList(place) {
+      const container = document.getElementById('modal-reviews-list');
+      container.innerHTML = '';
+
+      const reviews = place.communityReviews || [];
+      document.getElementById('comment-list-count').innerText = `${reviews.length} Classmate Thoughts`;
+
+      if (reviews.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-xs text-sky-300/50 italic bg-slate-900/50 rounded-2xl border border-sky-500/10">
+            No classmate reviews yet. Be the first to leave a thought above!
+          </div>
+        `;
+        return;
+      }
+
+      reviews.forEach((r, idx) => {
+        const item = document.createElement('div');
+        item.className = 'bg-slate-900/90 border border-sky-500/20 rounded-2xl p-3.5 space-y-1.5';
+        item.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-sky-300">${r.name}</span>
+              <div class="text-[11px] text-amber-300 flex gap-0.5">${renderStarsHTML(r.rating)}</div>
+            </div>
+            <span class="text-[10px] text-sky-300/50 font-semibold">${r.timeAgo}</span>
+          </div>
+          <p class="text-xs text-sky-100 font-medium">${r.msg}</p>
+          <div class="flex justify-end pt-1">
+            <button onclick="likeReview('${place.id}', ${idx})" class="text-[11px] font-semibold text-sky-300/60 hover:text-sky-300 flex items-center gap-1 transition">
+              <i class="fa-regular fa-thumbs-up"></i>
+              <span>${r.likes || 0} Helpful</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function likeReview(placeId, reviewIndex) {
+      sound.playPop();
+      const place = placesData.find(p => p.id === placeId);
+      if (place && place.communityReviews && place.communityReviews[reviewIndex]) {
+        place.communityReviews[reviewIndex].likes = (place.communityReviews[reviewIndex].likes || 0) + 1;
+        saveAppData();
+        renderCommunityReviewsList(place);
+      }
+    }
+
+    function openAddModal() {
+      sound.playSparkle();
+      document.getElementById('modal-add').classList.remove('hidden');
+    }
+
+    function closeAddModal() {
+      sound.playPop();
+      document.getElementById('modal-add').classList.add('hidden');
+    }
+
+    function handleAddPlaceSubmit(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('add-name').value.trim();
+      const location = document.getElementById('add-location').value.trim();
+      const category = document.getElementById('add-category').value;
+      const rating = parseFloat(document.getElementById('add-rating').value);
+      const review = document.getElementById('add-review').value.trim();
+      const author = document.getElementById('add-author').value.trim();
+
+      const sampleImages = [
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
+      ];
+      const randomImg = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+
+      const newSpot = {
+        id: 'place-' + Date.now(),
+        title: name,
+        location: location,
+        category: category,
+        tags: [category, 'Bucket List'],
+        meeeRating: rating,
+        meeeReview: review,
+        bestThing: 'Suggested destination by classmate!',
+        dateVisited: 'Suggested Spot',
+        image: randomImg,
+        isMeeeLog: false,
+        author: author,
+        communityReviews: []
+      };
+
+      placesData.unshift(newSpot);
+      saveAppData();
+      closeAddModal();
+      
+      switchViewMode('bucket-list');
+      showToast('New spot added to Classmate Bucket List! 🚀');
+    }
+
+    function openQuizModal() {
+      sound.playSparkle();
+      resetQuiz();
+      document.getElementById('modal-quiz').classList.remove('hidden');
+    }
+
+    function closeQuizModal() {
+      sound.playPop();
+      document.getElementById('modal-quiz').classList.add('hidden');
+    }
+
+    function selectQuizOpt(questionNum, val, btnEl) {
+      sound.playPop();
+      quizAnswers[`q${questionNum}`] = val;
+
+      const groupBtns = document.querySelectorAll(`.q${questionNum}-btn`);
+      groupBtns.forEach(b => {
+        b.className = `q${questionNum}-btn p-3 rounded-xl bg-slate-900 border border-sky-500/20 text-xs font-semibold text-left text-sky-200/80`;
+      });
+      btnEl.className = `q${questionNum}-btn p-3 rounded-xl bg-sky-400/20 border border-sky-400 text-xs font-semibold text-left text-sky-200`;
+    }
+
+    function calculateQuizResult() {
+      sound.playSparkle();
+      const desiredCat = quizAnswers.q1;
+      
+      let match = placesData.find(p => p.category === desiredCat || p.tags.includes(desiredCat));
+      if (!match) match = placesData[0];
+
+      const resultCard = document.getElementById('quiz-recommended-card');
+      resultCard.innerHTML = `
+        <div class="flex items-center gap-3">
+          <img src="${match.image}" class="w-16 h-16 rounded-xl object-cover">
+          <div>
+            <span class="text-[10px] font-bold text-sky-400 uppercase tracking-wider">${match.category}</span>
+            <h4 class="font-serif-title text-base font-bold text-sky-100">${match.title}</h4>
+            <p class="text-xs text-sky-300/70">${match.location}</p>
+          </div>
+        </div>
+        <p class="text-xs text-sky-200/80 pt-1 italic">"${match.meeeReview}"</p>
+        <button onclick="closeQuizModal(); openDetailsModal('${match.id}');" class="w-full mt-2 py-2 rounded-xl bg-sky-400 text-slate-950 font-bold text-xs text-center">
+          View Full Travel Log
+        </button>
+      `;
+
+      document.getElementById('quiz-step-box').classList.add('hidden');
+      document.getElementById('quiz-result-box').classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+      document.getElementById('quiz-step-box').classList.remove('hidden');
+      document.getElementById('quiz-result-box').classList.add('hidden');
+    }
+
+    window.onload = () => {
+      loadAppData();
+    };
+  </script>
+</body>
+</html>
